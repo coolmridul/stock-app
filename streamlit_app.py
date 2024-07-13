@@ -42,7 +42,7 @@ def call_api(start_date,end_date,symbol):
     df['Turnover ₹  '] = df['Turnover ₹  '].str.replace(',', '').astype(float)
     df['VWAP'] = df['Turnover ₹  ']/df['Total Traded Quantity  ']
     df['Avg Quantity Per Trade'] = df['Total Traded Quantity  ']/df['No. of Trades  ']
-    df['date_column'] = pd.to_datetime(df['Date  '], format='%d-%b-%Y').dt.strftime('%d-%b')
+    df['date_column'] = pd.to_datetime(df['Date  '], format='%d-%b-%Y').dt.strftime('%b-%Y')
     st.dataframe(df)
 
     df4 = df.groupby(['date_column'],sort=False).agg({'Total Traded Quantity  ': ['sum','mean'],
