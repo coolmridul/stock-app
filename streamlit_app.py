@@ -8,6 +8,13 @@ from dateutil.relativedelta import relativedelta
 
 st.title("NSE Data")
 
+# Add custom CSS to hide the GitHub icon
+hide_github_icon = """
+#GithubIcon {
+  visibility: hidden;
+}
+"""
+st.markdown(hide_github_icon, unsafe_allow_html=True)
 
 baseurl = "https://www.nseindia.com/"
 headers = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, '
@@ -32,12 +39,15 @@ def call_api(start_date,end_date,symbol):
     df['Total Traded Quantity  '] = df['Total Traded Quantity  '].str.replace(',', '').astype(int)
     df['No. of Trades  '] = df['No. of Trades  '].str.replace(',', '').astype(int)
     df['Deliverable Qty  '] = df['Deliverable Qty  '].str.replace(',', '').astype(int)
+    df['Turnover ₹  '] = df['Turnover ₹  '].str.replace(',', '').astype(float)
+    df['VWAP'] = df['Turnover ₹  ']/df['Total Traded Quantity  ']
     df['Avg Quantity Per Trade'] = df['Total Traded Quantity  ']/df['No. of Trades  ']
     df['date_column'] = pd.to_datetime(df['Date  '], format='%d-%b-%Y').dt.strftime('%d-%b')
     st.dataframe(df)
 
     df4 = df.groupby(['date_column'],sort=False).agg({'Total Traded Quantity  ': ['sum','mean'],
          'Deliverable Qty  ': ['sum','mean'],
+         'VWAP': 'sum'
          }).reset_index()
     
     st.dataframe(df4)
