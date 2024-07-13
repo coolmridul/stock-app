@@ -29,7 +29,18 @@ def call_api(start_date,end_date,symbol):
         f.write(response.content)
     
     df = pd.read_csv('data.csv')
+    df['Total Traded Quantity  '] = df['Total Traded Quantity  '].str.replace(',', '').astype(int)
+    df['No. of Trades  '] = df['No. of Trades  '].str.replace(',', '').astype(int)
+    df['Deliverable Qty  '] = df['Deliverable Qty  '].str.replace(',', '').astype(int)
+    df['Avg Quantity Per Trade'] = df['Total Traded Quantity  ']/df['No. of Trades  ']
+    df['date_column'] = pd.to_datetime(df['Date  '], format='%d-%b-%Y').dt.strftime('%d-%b')
     st.dataframe(df)
+
+    df4 = df.groupby(['date_column'],sort=False).agg({'Total Traded Quantity  ': ['sum','mean'],
+         'Deliverable Qty  ': ['sum','mean'],
+         }).reset_index()
+    
+    st.dataframe(df4)
 
 start_date = st.date_input("Start Date", datetime.datetime.today() + relativedelta(years=-1),format="DD-MM-YYYY")
 start_date_formatted = start_date.strftime("%d-%m-%Y")
@@ -39,7 +50,7 @@ end_date_formatted = end_date.strftime("%d-%m-%Y")
 
 option = st.selectbox(
    "Symbols",
-   NIFTY100,
+   NIFTYALL,
    index=None,
    placeholder="Select stock from the list..",
 )
