@@ -8,11 +8,12 @@ from dateutil.relativedelta import relativedelta
 
 st.title("NSE Data")
 
-# Add custom CSS to hide the GitHub icon
 hide_github_icon = """
-#GithubIcon {
+<style>
+#MainMenu {
   visibility: hidden;
 }
+<style>
 """
 st.markdown(hide_github_icon, unsafe_allow_html=True)
 
@@ -40,16 +41,25 @@ def call_api(start_date,end_date,symbol):
     df['No. of Trades  '] = df['No. of Trades  '].str.replace(',', '').astype(int)
     df['Deliverable Qty  '] = df['Deliverable Qty  '].str.replace(',', '').astype(int)
     df['Turnover ₹  '] = df['Turnover ₹  '].str.replace(',', '').astype(float)
-    df['VWAP'] = df['Turnover ₹  ']/df['Total Traded Quantity  ']
+    # df['VWAP'] = df['Turnover ₹  ']/df['Total Traded Quantity  ']
     df['Avg Quantity Per Trade'] = df['Total Traded Quantity  ']/df['No. of Trades  ']
     df['date_column'] = pd.to_datetime(df['Date  '], format='%d-%b-%Y').dt.strftime('%b-%Y')
     st.dataframe(df)
 
     df4 = df.groupby(['date_column'],sort=False).agg({'Total Traded Quantity  ': ['sum','mean'],
          'Deliverable Qty  ': ['sum','mean'],
-         'VWAP': 'sum'
+         'Turnover ₹  ': 'sum'
          }).reset_index()
     
+    df4.columns = ['_'.join(col).strip() for col in df4.columns.values]
+    
+    df4.columns = [
+    'Date', 
+    'Total_Traded_Quantity_Sum', 'Total_Traded_Quantity_Mean',
+    'Deliverable_Qty_Sum', 'Deliverable_Qty_Mean',
+    'Turnover_Sum']
+
+    df4['VWAP'] = df4['Turnover_Sum']/df4['Total_Traded_Quantity_Sum']
     st.dataframe(df4)
 
 start_date = st.date_input("Start Date", datetime.datetime.today() + relativedelta(years=-1),format="DD-MM-YYYY")
