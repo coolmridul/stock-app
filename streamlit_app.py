@@ -36,7 +36,7 @@ def call_api(start_date,end_date,symbol):
     with open('data.csv', 'wb') as f:
         f.write(response.content)
     
-    df = pd.read_csv('data.csv')
+    df = pd.read_csv('data.csv',encoding='unicode_escape')
     df['Total Traded Quantity  '] = df['Total Traded Quantity  '].str.replace(',', '').astype(int)
     df['No. of Trades  '] = df['No. of Trades  '].str.replace(',', '').astype(int)
     df['Deliverable Qty  '] = df['Deliverable Qty  '].str.replace(',', '').astype(int)
